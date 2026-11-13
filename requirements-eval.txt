@@ -1,0 +1,36 @@
+# torch/xformers from the cu121 index; pytorch3d: pip install "git+https://github.com/facebookresearch/pytorch3d.git@V0.7.8"
+torch==2.5.1
+torchvision==0.20.1
+xformers==0.0.28.post3
+numpy==1.26.4
+opencv-python==4.11.0.86
+pillow==12.3.0
+scipy==1.15.3
+tqdm==4.70.0
+
+# FoundationStereo
+omegaconf==2.3.0
+timm==1.0.10
+huggingface_hub==0.36.2
+imageio==2.37.3
+open3d==0.19.0
+trimesh==4.12.2
+joblib==1.5.3
+pandas==2.3.3
+scikit-image==0.25.2
+
+# LPIPS
+lpips==0.1.4
+
+# MEt3R (+ FeatUp backbone, MASt3R)
+torchmetrics==1.9.0
+einops==0.8.2
+jaxtyping==0.3.7
+kornia==0.8.2
+roma==1.5.6
+safetensors==0.8.0rc1
+
+# iSQoE
+lightning==2.6.5
+peft==0.20.0
+pillow_heif==1.5.0

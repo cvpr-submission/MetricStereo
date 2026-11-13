@@ -1,0 +1,10 @@
+weights/
+data/
+outputs/
+eval_cache/
+third_party/
+__pycache__/
+*.pyc
+cache/
+overnight.log
+*.log
