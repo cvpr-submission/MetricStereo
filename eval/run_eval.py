@@ -3,6 +3,7 @@ from pathlib import Path
 from statistics import median
 
 import numpy as np
+import cv2
 import torch
 from PIL import Image
 from tqdm import tqdm
@@ -19,6 +20,9 @@ OUT_ROOT = REPO_ROOT / "outputs" / "eval_common_s768"
 CACHE_ROOT = REPO_ROOT / "cache" / "fs_pseudo_gt_s768"
 
 STEREO_DATASETS = ["booster", "layeredflow", "middlebury", "spring"]
+# stereo benchmarks with public ground-truth disparity; on the others (test splits without public ground truth) the
+# reference is FoundationStereo on the real pair in the same frame
+GT_DISPARITY_DATASETS = ["middlebury"]
 DEPTH_DATASETS = ["kitti", "sintel", "eth3d", "tum", "nyu"]
 MAIN_DATASETS = STEREO_DATASETS + ["kitti", "sintel"]
 SHORT_SIDE = 768
@@ -42,6 +46,13 @@ def cached_disparity(path: Path, fs: FSDisparity, left: np.ndarray, right: np.nd
     return np.load(path)
 
 
+def gt_disparity_in_frame(path: Path, size: tuple) -> np.ndarray:
+    """Ground-truth disparity resized to the frame (nearest neighbor) and rescaled to frame pixels, invalid -> NaN."""
+    g = np.load(path).astype(np.float32)
+    g[~np.isfinite(g) | (g <= 0)] = np.nan
+    return cv2.resize(g, size, interpolation=cv2.INTER_NEAREST) * (size[0] / g.shape[1])
+
+
 def evaluate_dataset(ds: str, fs: FSDisparity, image_metrics: ImageMetrics, gen_root: Path, bench_root: Path,
                      out_root: Path, cache_root: Path) -> dict:
     stereo = ds in STEREO_DATASETS
@@ -59,7 +70,9 @@ def evaluate_dataset(ds: str, fs: FSDisparity, image_metrics: ImageMetrics, gen_
         left_c = resize(left, size)
 
         pred_disp = cached_disparity(out / "pred_disp" / f"{name}.npy", fs, left_c, resize(read_rgb(gen_path), size))
-        if stereo:
+        if ds in GT_DISPARITY_DATASETS:
+            gt_depth = disparity_to_depth(gt_disparity_in_frame(bench / "gt_disparity" / f"{name}.npy", size))
+        elif stereo:
             gt_depth = disparity_to_depth(cached_disparity(cache_root / ds / f"{name}.npy", fs, left_c,
                                                            resize(right_gt, size)))
         else:

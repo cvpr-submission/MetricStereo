@@ -3,7 +3,7 @@
 Inference code for MetricStereo: left image + baseline (m) -> right view.
 Weights: [cvprsubmission/metricstereo-model](https://huggingface.co/cvprsubmission/metricstereo-model)
 
-Settings are fixed to the ones used in the paper: 768x768, DPM-Solver++ 25 steps, CFG 3->1 (cosine), 54 deg FOV,
+Settings are fixed to the ones used in the paper: 768x768, DPM-Solver++ 25 steps, CFG 3->1 (cosine),
 seed = image index. The U-Net uses cross-view synchronized normalization (SyncVN, `SYNC_VIEW_NORM` in
 `metricstereo/config.py`).
 
@@ -48,7 +48,7 @@ benchmark (Google Drive, 50 GB) into `data/raw/`, then:
   baseline from the stereo extrinsics goes to `manifest.csv`.
 
 Images, right views, depth and baselines are identical to the files used in the paper. Sintel intrinsics are
-the per-frame values from the `.cam` files; they are not used by `generate` or `eval` (fixed 54° field of view).
+the per-frame values from the `.cam` files.
 `data/raw/` can be deleted afterwards.
 
 | | Booster | LayeredFlow | Middlebury | Spring | KITTI | Sintel | ETH3D | TUM | NYUv2 |
@@ -57,7 +57,7 @@ the per-frame values from the `.cam` files; they are not used by `generate` or `
 | source | zip 3.9G | official | zip 0.6G | zip 6.2G | zip 0.2G | official | zip 1.4G | zip 0.8G | zip 0.4G |
 | license | CC BY-NC 4.0 | no license (all rights reserved) | use + publish | CC BY 4.0 | CC BY-NC-SA 3.0 | MPI PS:License 1.0 | CC BY-NC-SA 4.0 | CC BY 4.0 | none stated |
 
-Layout: `data/benchmarks/<name>/{images,right,gt_depth,intrinsics,manifest.csv}`. Each benchmark keeps its
+Layout: `data/benchmarks/<name>/{images,right,gt_depth,intrinsics,manifest.csv}`, plus `gt_disparity` for Middlebury. Each benchmark keeps its
 original license; please cite the original datasets.
 
 ## Evaluation
@@ -67,13 +67,16 @@ bash scripts/setup_eval_deps.sh
 python -m eval.run_eval                  # -> outputs/eval_common_s768/summary.json  (~7 h, A100)
 ```
 
+Geometry on Middlebury is scored against its ground-truth disparity. Ground-truth disparity is not public for the
+Booster, LayeredFlow and Spring test splits, so there the reference is FoundationStereo on the real pair.
+
 Expected:
 
 ```
 dataset        delta1      rel   sawa_h    lpips    met3r    isqoe
 booster        0.9684   0.0413   0.8378   0.3097   0.0887   0.6319
 layeredflow    0.8755   0.0814   1.1245   0.4001   0.1216   0.6565
-middlebury     0.8818   0.0857   0.9133   0.3408   0.1005   0.6740
+middlebury     0.8862   0.0895   1.2115   0.3408   0.1005   0.6740
 spring         0.7840   0.1191   1.4005   0.1394   0.0942   0.7848
 kitti          0.9617   0.0571   1.3437        -   0.0690   0.7214
 sintel         0.7019   0.2263   1.6260        -   0.1494   0.8216
