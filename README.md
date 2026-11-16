@@ -103,12 +103,12 @@ Expected (`outputs/scene_search/eval/summary.json`):
 dataset        delta1      rel   sawa_h    lpips    met3r    isqoe
 booster        0.9674   0.0420   0.8263   0.2578   0.0999   0.6445
 layeredflow    0.8798   0.0802   1.1204   0.3395   0.1382   0.6730
-middlebury     0.8820   0.0852   0.9041   0.2447   0.0958   0.6638
+middlebury     0.8807   0.0873   1.1999   0.2447   0.0958   0.6638
 spring         0.7906   0.1158   1.4121   0.1292   0.0920   0.7846
-stereo         0.8799   0.0808   1.0657   0.2428   0.1065   0.6915
+stereo         0.8796   0.0813   1.1397   0.2428   0.1065   0.6915
 ```
 
 The expected numbers above were produced on NVIDIA RTX PRO 6000 (Blackwell) GPUs, and on that GPU this code reproduces
 them bit-exactly (identical generated images and per-scene selections). Diffusion sampling is not
-bit-reproducible across GPU architectures: on an A100 the generated images differ slightly, and the per-scene search on
-Middlebury changed each metric by at most 0.004 (LPIPS by 0.0002). `check_reproduction` is bit-exact on A100.
+bit-reproducible across GPU architectures: on an A100 the generated images differ slightly, and the metrics change in the third
+decimal. `check_reproduction` is bit-exact on A100.
